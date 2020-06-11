@@ -1,0 +1,29 @@
+# Test against this version of Node.js
+environment:
+  nodejs_version: "6.10.2"
+
+# Install scripts. (runs after repo cloning)
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:nodejs_version x64
+  # install modules
+  - npm install
+
+# Post-install test scripts.
+test_script:
+  # Output useful info for debugging.
+  - node --version
+  - npm --version
+  # run tests
+  - npm test
+
+after_test:
+  - npm install istanbul@0.4.5
+  - npm install coveralls@2.13.0
+  - node_modules\.bin\istanbul cover bin\njsunit.js --report lcovonly
+  - node_modules\.bin\istanbul report
+  - ps: get-content .\coverage\lcov.info | node .\node_modules\coveralls\bin\coveralls.js
+  #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+# Don't actually do MSBuild.
+build: off

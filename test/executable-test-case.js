@@ -9,7 +9,7 @@ class ExecutableTestCase extends TestCase {
     }
 
     replaceOutputNewLines(outputStr) {
-        return outputStr.toString().replace(/(?:\r\n|\r|\n)/g, '')
+        return outputStr.toString().replace(/(?:\r\n|\r|\n)/g, '').replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')
     }
 
     testExecutableOutput() {
@@ -39,29 +39,39 @@ class ExecutableTestCase extends TestCase {
             cwd: exePath
         })
         actualOutput = this.replaceOutputNewLines(actualOutput)
-        var expectedOutput = `Total Run: 1Total Passed: 1Total Failed: 0Total Errors: 0`
+        actualOutput = actualOutput.replace(/finished.*ms/g, '')
+        var expectedOutput = `ExePassTestCase#testPassAssertion:    [√] Assertion PassedExePassTestCase#testPassAssertion finished in 0 msTotal Run: 1Total Passed: 1Total Failed: 0Total Errors: 0`
+        expectedOutput = expectedOutput.replace(/finished.*ms/g, '')
         this.assertEqual(expectedOutput, actualOutput)
     }
 
     testExecutableFailOutput() {
         var failFileName = path.join(exePath, 'test', 'test-exe', 'exe-fail-test-case.js')
         var actualOutput = this.getExeOutput(failFileName)
-        var expectedOutput = 'Total Run: 2Total Passed: 0Total Failed: 2   1. ExeFailTestCase#testFailAssertWithPromise[test]:           Assertion failed.   2. ExeFailTestCase#testFailAssertion[test]:           Assertion failed.Total Errors: 0'
+        actualOutput = actualOutput.replace(/finished.*ms/g, '')
+        var expectedOutput = 'ExeFailTestCase#testFailAssertWithPromise:    [×] Assertion FailedExeFailTestCase#testFailAssertWithPromise finished in 16 msExeFailTestCase#testFailAssertion:    [×] Assertion FailedExeFailTestCase#testFailAssertion finished in 0 msTotal Run: 2Total Passed: 0Total Failed: 2   1. ExeFailTestCase#testFailAssertWithPromise[test]:           Assertion failed.   2. ExeFailTestCase#testFailAssertion[test]:           Assertion failed.Total Errors: 0'
+        expectedOutput = expectedOutput.replace(/finished.*ms/g, '')
         this.assertEqual(expectedOutput, actualOutput)
         
         failFileName = path.join(exePath, 'test', 'test-exe', 'unhandled-error-test-cases', 'set-up-unhandled-error-test-case.js')
         actualOutput = this.getExeOutput(failFileName)
-        expectedOutput = 'Total Run: 1Total Passed: 0Total Failed: 1   1. SetUpUnhandledErrorTestCase#testUnhandledError[setUp]:           Assertion failed.Total Errors: 0'
+        actualOutput = actualOutput.replace(/finished.*ms/g, '')
+        expectedOutput = 'SetUpUnhandledErrorTestCase#testUnhandledError:    [×] Assertion FailedSetUpUnhandledErrorTestCase#testUnhandledError finished in 16 msTotal Run: 1Total Passed: 0Total Failed: 1   1. SetUpUnhandledErrorTestCase#testUnhandledError[setUp]:           Assertion failed.Total Errors: 0'
+        expectedOutput = expectedOutput.replace(/finished.*ms/g, '')
         this.assertEqual(expectedOutput, actualOutput)
 
         failFileName = path.join(exePath, 'test', 'test-exe', 'unhandled-error-test-cases', 'unhandled-error-test-case.js')
         actualOutput = this.getExeOutput(failFileName)
-        expectedOutput = 'Total Run: 1Total Passed: 0Total Failed: 1   1. UnhandledErrorTestCase#testUnhandledError[test]:           Assertion failed.Total Errors: 0'
+        actualOutput = actualOutput.replace(/finished.*ms/g, '')
+        expectedOutput = 'UnhandledErrorTestCase#testUnhandledError:    [×] Assertion FailedUnhandledErrorTestCase#testUnhandledError Total Run: 1Total Passed: 0Total Failed: 1   1. UnhandledErrorTestCase#testUnhandledError[test]:           Assertion failed.Total Errors: 0'
+        expectedOutput = expectedOutput.replace(/finished.*ms/g, '')
         this.assertEqual(expectedOutput, actualOutput)
 
         failFileName = path.join(exePath, 'test', 'test-exe', 'unhandled-error-test-cases', 'tear-down-unhandled-error-test-case.js')
         actualOutput = this.getExeOutput(failFileName)
-        expectedOutput = 'Total Run: 1Total Passed: 0Total Failed: 1   1. TearDownUnhandledErrorTestCase#testUnhandledError[tearDown]:           Assertion failed.Total Errors: 0'
+        actualOutput = actualOutput.replace(/finished.*ms/g, '')
+        expectedOutput = 'TearDownUnhandledErrorTestCase#testUnhandledError:    [×] Assertion FailedTearDownUnhandledErrorTestCase#testUnhandledError Total Run: 1Total Passed: 0Total Failed: 1   1. TearDownUnhandledErrorTestCase#testUnhandledError[tearDown]:           Assertion failed.Total Errors: 0'
+        expectedOutput = expectedOutput.replace(/finished.*ms/g, '')
         this.assertEqual(expectedOutput, actualOutput)
     }
 
@@ -75,7 +85,9 @@ class ExecutableTestCase extends TestCase {
     testExecutableErrorOutput() {
         var errorFileName = path.join(exePath, 'test', 'test-exe', 'exe-error-test-case.js')
         var actualOutput = this.getExeOutput(errorFileName)
-        var expectedOutput = 'Total Run: 2Total Passed: 0Total Failed: 0Total Errors: 2   1. ExeErrorTestCase#testPromiseWithCallback[test]:           Both promise and callback cannot be used.   2. ExeErrorTestCase#testError[test]:           foo is not defined'
+        actualOutput = actualOutput.replace(/finished.*ms/g, '')
+        var expectedOutput = 'ExeErrorTestCase#testPromiseWithCallback:ExeErrorTestCase#testPromiseWithCallback finished in 0 msExeErrorTestCase#testError:ExeErrorTestCase#testError finished in 0 msTotal Run: 2Total Passed: 0Total Failed: 0Total Errors: 2   1. ExeErrorTestCase#testPromiseWithCallback[test]:           Both promise and callback cannot be used.   2. ExeErrorTestCase#testError[test]:           foo is not defined'
+        expectedOutput = expectedOutput.replace(/finished.*ms/g, '')
         this.assertEqual(expectedOutput, actualOutput)
     }
 
